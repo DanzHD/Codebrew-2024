@@ -8,6 +8,7 @@ import {useEffect, useState} from "react";
 import {CHINESE, ENGLISH, FRENCH, JAPANESE, LISTENING, READING, SPEAKING} from "../../Util/Constants.jsx";
 import "./_header.scss"
 import "./_reading.scss"
+import "./_listening.scss"
 import TextArea from "../../Components/TextArea/TextArea.jsx";
 
 const languageOptions = [
@@ -33,6 +34,8 @@ export default function Main() {
             setInvalidInput(true);
             return;
         }
+        setLanguageSelection(null);
+        setSkillSelection(null);
 
         setInvalidInput(false);
         setSkill(skillSelection.value)
@@ -45,6 +48,10 @@ export default function Main() {
         return (
             <ReadingTest language={languageSelection} setSkill={setSkill} />
         )
+    }
+
+    if (skill === LISTENING) {
+        return <ListeningTest language={languageSelection} setSkill={setSkill} />
     }
 
 
@@ -175,7 +182,6 @@ function ReadingTest({
         const form = e.target;
         const formData = new FormData(form);
         const formJson = Object.fromEntries(formData.entries());
-        console.log(formJson);
     }
 
     return (
@@ -214,4 +220,94 @@ function ReadingTest({
         </>
     )
 
+}
+
+function ListeningTest({
+    language,
+    setSkill
+}) {
+    const [audioPlaying, setAudioPlaying] = useState(false);
+    const [questions, setQuestions] = useState([]);
+    const [soluions, setSolutions] = useState([]);
+    useEffect(() => {
+
+
+        let sampleQuestions = [
+            {
+                number: 1,
+                question: "What is a potato"
+            },
+            {
+                number: 2,
+                question: "What is a potato"
+            },
+            {
+                number: 3,
+                question: "What is a potato"
+            },
+            {
+                number: 4,
+                question: "What is a potato"
+            },
+            {
+                number: 5,
+                question: "What is a potato"
+            },
+            {
+                number: 6,
+                question: "What is a potato"
+            },
+        ]
+        setQuestions(sampleQuestions);
+
+    }, []);
+
+    return (
+        <>
+            <div className="header">
+                <Text>LogoPlaceHolder</Text>
+                <Text heading bold>Listening</Text>
+                <Button onClick={() => setSkill(null)}>Back</Button>
+            </div>
+            <div className="play-audio">
+
+                {
+                    audioPlaying ?
+                        <>
+                            <span className="material-symbols-outlined audio-clip">
+                            stop_circle
+                            </span>
+                            <Button>Stop Audio</Button>
+                        </> :
+                        <>
+                            <span className="material-symbols-outlined audio-clip">
+                                sound_sampler
+                            </span>
+                            <Button>Play Audio</Button>
+                        </>
+
+                }
+
+            </div>
+
+            <form className="listening-questions">
+
+                <Text bold>Based on the audio above, answer the following questions.</Text>
+                {
+                    questions.map(question => {
+                        return (
+                            <div key={question['number']} className="question">
+                                <Text >{question['number']}. {question['question']}</Text>
+                                <TextArea name={question['number']} fullWidth></TextArea>
+                            </div>
+                        )
+                    })
+                }
+                <div className="questions__submit">
+
+                    <Button submit dynamicWidth >Mark Answer</Button>
+                </div>
+            </form>
+        </>
+)
 }

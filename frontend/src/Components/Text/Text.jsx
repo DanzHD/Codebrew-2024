@@ -22,13 +22,13 @@ export default function Text({
     }
 
     const computedClassNames = cx(
+        `text--${color}`,
         "text",
         {
             "text--bold": bold,
             "text--small": small,
             "text--large": large,
-            "text--italicize": italicize,
-            "text--${color}": color
+            "text--italicize": italicize
         },
         className
     );
