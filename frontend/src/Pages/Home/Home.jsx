@@ -3,9 +3,11 @@ import Text from "../../Components/Text/Text.jsx";
 import Button from "../../Components/Button/Button.jsx";
 import useThemeContext from "../../Context/ThemeContext/useThemeContext.jsx";
 import {THEMES} from "../../Context/ThemeContext/ThemeContext.jsx";
+import {useNavigate} from "react-router";
 
 export default function Home() {
     const {theme, handleToggleTheme} = useThemeContext();
+    const navigate = useNavigate();
 
     return (
         <>
@@ -13,7 +15,7 @@ export default function Home() {
                 {
                     theme === THEMES.light ?
                         <div onClick={handleToggleTheme} className="material-symbols-outlined theme">dark_mode</div> :
-                        <div onClick={handleToggleTheme} className="material-symbols-outlined theme">light_mode</div>
+                        <div onClick={handleToggleTheme} style={{color: "white"}} className="material-symbols-outlined theme">light_mode</div>
 
                 }
             </div>
@@ -32,7 +34,7 @@ export default function Home() {
                         </Text>
                     </div>
                     <div className="home__intro__button">
-                        <Button ><Text>Start learning</Text></Button>
+                        <Button onClick={() => navigate('/main')}><Text>Start learning</Text></Button>
                     </div>
 
                 </div>

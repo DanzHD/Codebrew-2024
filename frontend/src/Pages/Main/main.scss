@@ -1,0 +1,76 @@
+@import "../../Styles/vars";
+@import "../../Styles/themes";
+
+
+.main {
+    max-height: 100vh;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+
+}
+
+
+
+.container-input {
+    margin-top: auto;
+    margin-bottom: auto;
+
+    > .title {
+        display: flex;
+
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    > .field-group {
+        padding-top: 7.375rem;
+        display: flex;
+        flex-direction: column;
+        gap: 2.125rem;
+
+        > .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        > .button {
+            color: white;
+            border-radius: 15px;
+        }
+    }
+}
+
+
+
+@media screen and (min-width: $mobile-width) {
+    .container-input {
+        padding: 0 4.375rem 0 9.375rem;
+        flex-grow: 1;
+    }
+
+}
+
+@media screen and (max-width: $mobile-width) {
+    .container-hero {
+
+        > img {
+            display: none;
+        }
+    }
+
+    .container-input {
+        padding: 0 20px 0 20px;
+
+    }
+}
+
+@media screen and (min-width: $mobile-width) {
+    .container-hero {
+        height: 100vh;
+        > img {
+            height: 100vh;
+        }
+    }
+}

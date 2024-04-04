@@ -50,5 +50,13 @@ p.text {
         &--bold {
             font-weight: 800;
         }
+
+        &--italicize {
+            font-style: italic;
+        }
+
+        &--white {
+            color: white;
+        }
     }
 }
