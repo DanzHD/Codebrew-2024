@@ -54,6 +54,10 @@ export default function Main() {
         return <ListeningTest language={languageSelection} setSkill={setSkill} />
     }
 
+    if (skill === SPEAKING) {
+        return <SpeakingPractice setSkill={setSkill} language={languageSelection} />
+    }
+
 
     return (
         <FormSelection
@@ -187,11 +191,7 @@ function ReadingTest({
     return (
         <>
 
-            <div className="header">
-                <Text>LogoPlaceHolder</Text>
-                <Text heading bold>Reading</Text>
-                <Button onClick={() => setSkill(null)}>Back</Button>
-            </div>
+            <Header setSkill={setSkill} skill={READING} />
             <div className="passage">
                 <div className="passage__text">
 
@@ -264,29 +264,13 @@ function ListeningTest({
 
     return (
         <>
-            <div className="header">
-                <Text>LogoPlaceHolder</Text>
-                <Text heading bold>Listening</Text>
-                <Button onClick={() => setSkill(null)}>Back</Button>
-            </div>
+            <Header setSkill={setSkill} skill={LISTENING} />
+
             <div className="play-audio">
-
-                {
-                    audioPlaying ?
-                        <>
-                            <span className="material-symbols-outlined audio-clip">
-                            stop_circle
-                            </span>
-                            <Button>Stop Audio</Button>
-                        </> :
-                        <>
-                            <span className="material-symbols-outlined audio-clip">
-                                sound_sampler
-                            </span>
-                            <Button>Play Audio</Button>
-                        </>
-
-                }
+                <audio controls>
+                    <source src="horse.mp3" type="audio/mpeg"/>
+                    Your browser does not support the audio element.
+                </audio>
 
             </div>
 
@@ -309,5 +293,31 @@ function ListeningTest({
                 </div>
             </form>
         </>
-)
+    )
+}
+
+function SpeakingPractice({
+    language,
+    setSkill
+}) {
+
+    return (
+        <>
+            <Header setSkill={setSkill} skill={SPEAKING} />
+            <Text>Speaking</Text>
+        </>
+    )
+}
+
+function Header({
+    setSkill,
+    skill
+}) {
+    return (
+        <div className="header">
+            <Text>LogoPlaceHolder</Text>
+            <Text heading bold>{skill}</Text>
+            <Button onClick={() => setSkill(null)}>Back</Button>
+        </div>
+    )
 }
