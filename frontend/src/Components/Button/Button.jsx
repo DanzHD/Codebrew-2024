@@ -15,6 +15,7 @@ export default function Button({
     small,
     fullWidth,
     dynamicWidth,
+    submit,
     type = buttonTypes.primary,
 
 }) {
@@ -30,5 +31,5 @@ export default function Button({
         className
     )
 
-    return <button className={computedClasses} id={id} onClick={onClick} disabled={disabled}>{children}</button>
+    return <button type={submit && "submit"} className={computedClasses} id={id} onClick={onClick} disabled={disabled}>{children}</button>
 }

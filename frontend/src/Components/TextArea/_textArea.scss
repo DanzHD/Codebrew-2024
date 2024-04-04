@@ -1,0 +1,14 @@
+.text-area {
+    resize: none;
+    font-family: "Playfair Display", "Open sans", sans-serif;
+    font-size: 14px;
+    &--fullWidth {
+        width: 100%;
+    }
+    height: fit-content;
+
+    &:focus {
+        border: none;
+        outline: none;
+    }
+}
