@@ -1,0 +1,41 @@
+@import "../../Styles/themes";
+@import "../../Styles/vars";
+@import "../../Styles/index";
+
+.home {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    padding: 4em 8rem 0 8rem;
+    height: 100%;
+
+    &__intro {
+        width: 50rem;
+
+        &__button {
+            display: flex;
+            justify-content: center;
+            padding-top: 30px;
+        }
+    }
+}
+
+.theme-icon {
+    padding-left: 10px;
+    padding-top: 10px;
+}
+
+@include themify($themes) {
+    background-color: themed("background");
+
+}
+
+
+
+@media screen and (max-width: $mobile-width) {
+    .home {
+
+        padding-left: 30px;
+        padding-right: 30px;
+    }
+}

@@ -1,0 +1,49 @@
+@import "../../Styles/index";
+@import "../../Styles/themes";
+@import "../../Styles/vars";
+
+.button {
+    border-radius: 4px;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+
+    &--small {
+        max-width: 100px;
+        max-height: 30px;
+        font-size: 12px;
+    }
+
+    &--full-width {
+        width: 100% !important;
+    }
+
+    &--dynamic-width {
+        padding-left: 20%;
+        padding-right: 20%;
+    }
+
+}
+
+.button:hover {
+    filter: brightness(150%);
+}
+
+@include themify($themes) {
+    .button {
+
+        color: themed("text");
+
+        &--primary {
+            background-color: #007bff;
+        }
+
+        &--secondary {
+            background-color: #28a745;
+        }
+    }
+}

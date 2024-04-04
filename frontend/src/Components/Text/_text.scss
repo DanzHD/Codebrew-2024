@@ -1,0 +1,54 @@
+@import "../../Styles/vars";
+@import "../../Styles/themes";
+
+@mixin text {
+    font-family: "Playfair Display", "Open sans", sans-serif;
+    font-weight: 400;
+    margin: 0;
+}
+
+@mixin header {
+    font-weight: 800;
+}
+
+h1.text {
+    @include header;
+    font-size: 24px;
+
+    @media screen and (max-width: $mobile-width) {
+        font-size: 20px;
+    }
+}
+
+h2.text {
+    @include header;
+    font-size: 20px;
+    @media screen and (max-width: $mobile-width) {
+        font-size: 16px;
+    }
+}
+
+p.text {
+    font-size: 16px;
+    @media screen and (max-width: $mobile-width) {
+        font-size: 12px;
+    }
+}
+
+@include themify($themes) {
+    .text {
+        @include text;
+        color: themed("text");
+
+        &--small {
+            font-size: 12px !important;
+        }
+        &--large {
+            font-size: 32px !important;
+        }
+
+        &--bold {
+            font-weight: 800;
+        }
+    }
+}

@@ -1,0 +1,27 @@
+@import "_themes.scss";
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+body, html {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 100vh;
+    overflow-x: hidden;
+
+    @include themify($themes) {
+
+        background-color: themed("background");
+
+    }
+
+}
+
+
+* {
+
+    box-sizing: border-box;
+}

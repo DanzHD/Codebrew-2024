@@ -1,0 +1,29 @@
+$themes: (
+    light: (
+        primary: #007bff,
+        secondary: #ff6f61,
+        background: #ffffff,
+        accent: #00cc66,
+        text: #333333,
+    ),
+    dark: (
+        primary: #4682b4,
+        secondary: #ff6f61,
+        background: #222222,
+        accent: #00cc66,
+        text: #ffffff
+    ),
+);
+
+@mixin themify($themes) {
+    @each $name, $values in $themes {
+        .#{$name}-theme {
+            $theme-map: $values !global;
+            @content
+        }
+    }
+}
+
+@function themed($key) {
+    @return map-get($theme-map, $key)
+}
