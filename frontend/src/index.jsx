@@ -5,10 +5,10 @@ import {ThemeContextProvider} from "./Context/ThemeContext/ThemeContext.jsx";
 
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
+
     <ThemeContextProvider>
 
         <App />
     </ThemeContextProvider>
-  </React.StrictMode>,
+
 )

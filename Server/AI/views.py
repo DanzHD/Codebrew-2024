@@ -1,11 +1,13 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 import os
-from django.http import JsonResponse
-
+from django.http import HttpResponse
+import uuid
+import json
 
 import google.generativeai as genai
 from google.cloud import texttospeech
+
 
 client = texttospeech.TextToSpeechClient()
 
@@ -16,20 +18,25 @@ genai.configure(api_key=GEMINI_API_KEY)
 model = genai.GenerativeModel('gemini-pro')
 
 
-@api_view(['GET'])
-def HelloWorld(request):
+tests = dict()
 
-    return Response("Hello World")
+@api_view(['POST'])
+def createAudio(request):
+    language = request.data['language']
+    if (language == "English"):
+        language_code = "en-US"
+    elif language == "Japanese":
+        language_code = "ja-JP"
+    elif language == "French":
+        language_code = "fr-CA"
+    elif language == "Chinese":
+        language_code = "cmn-CN"
 
-@api_view(['GET'])
-def Test(request):
 
-    
-
-    synthesis_input = texttospeech.SynthesisInput(text="Hello World!")
+    synthesis_input = texttospeech.SynthesisInput(text=request.data["text"])
 
     voice = texttospeech.VoiceSelectionParams(
-        language_code="en-US", ssml_gender=texttospeech.SsmlVoiceGender.NEUTRAL
+        language_code=language_code, ssml_gender=texttospeech.SsmlVoiceGender.MALE
     )
 
     audio_config = texttospeech.AudioConfig(
@@ -40,16 +47,52 @@ def Test(request):
         input=synthesis_input, voice=voice, audio_config=audio_config
     )
 
-    with open("output.mp3", "wb") as out:
-        out.write(response.audio_content)
-        print("Audio content written to file output.mp3")
-    
-    with open("output.mp3", "rb") as f:
-        audio_data = f.read()
-        print("Audio data stored")
+
+    return HttpResponse(response.audio_content, content_type='audio/mpeg')
+
+@api_view(['POST'])
+def mark_solutions(request):
+    prompt = "Here are the answers to the previous quesions\n"
+
+    for i in range(5):
+        prompt += f"Answer to question {i + 1}: {request.data[str(i)]}\n"
+
+    chatId = request.data['id']
+    chat = tests[chatId]
+    prompt += "Are they correct? return your answer in an array json format with the key 'answer'. There should be no backticks"
+    response = chat.send_message(prompt)
+    print(response.text)
+    jsonObject = json.loads(response.text)
+    return Response(jsonObject)
 
 
-    return Response(audio_data, status=200, content_type="audio/mpeg")
+
+@api_view(['GET'])
+def generate_text(request):
+    language = request.GET.get('language', '')
+
+    chat = model.start_chat(history=[])
+    chatId = str(uuid.uuid4())
+    tests[chatId] = chat
+    prompt = f"""Generate a text in {language} about a random topic. 
+        It should be less than 300 words. Create 5 questions based on the text.
+        return response in JSON format. 1 key for question, 1 key for text. 
+        Do not put backticks or the word JSON
+        """
+
+    response = chat.send_message(prompt)
+    print(response.text)
+
+    jsonObject = json.loads(response.text)
+
+    return Response({
+        "id": str(chatId),
+        "text": jsonObject['text'],
+        "questions": jsonObject["questions"]
+    })
+
+
+
 
 @api_view(['POST', 'GET'])
 def get_data(request):
@@ -63,3 +106,7 @@ def get_data(request):
         print(language)
 
     return Response(language)
+
+
+
+

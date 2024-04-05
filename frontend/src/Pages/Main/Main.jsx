@@ -5,7 +5,16 @@ import "./main.scss"
 import Select from "react-select";
 import Button from "../../Components/Button/Button.jsx";
 import {useEffect, useRef, useState} from "react";
-import {CHINESE, ENGLISH, FRENCH, JAPANESE, LISTENING, READING, SPEAKING} from "../../Util/Constants.jsx";
+import {
+    BACKEND_ENDPOINT,
+    CHINESE,
+    ENGLISH,
+    FRENCH,
+    JAPANESE,
+    LISTENING,
+    READING,
+    SPEAKING
+} from "../../Util/Constants.jsx";
 import "./_header.scss"
 import "./_reading.scss"
 import "./_listening.scss"
@@ -34,8 +43,7 @@ export default function Main() {
             setInvalidInput(true);
             return;
         }
-        setLanguageSelection(null);
-        setSkillSelection(null);
+
 
         setInvalidInput(false);
         setSkill(skillSelection.value)
@@ -43,15 +51,50 @@ export default function Main() {
 
     }
 
+    const handleMarkAnswers = async (e, chatId) => {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
+        const formJson = Object.fromEntries(formData.entries());
+        try {
+            const options = {
+                method: 'POST',
+                headers: {
+                    "content-type": "application/json"
+                },
+                body: JSON.stringify({
+                    ...formJson,
+                    "id": chatId
+                })
+            }
+            const res = await fetch(`${BACKEND_ENDPOINT}/solutions`, options);
+            const solutions = await res.json();
+            return solutions;
+        } catch (err) {
+            console.error(err)
+        }
+
+
+
+    }
+
+    const generateText = async ({ language }) => {
+        const BACKEND_ENDPOINT = new URL("http://127.0.0.1:8000/text");
+        BACKEND_ENDPOINT.searchParams.append("language", language);
+
+        const res = await fetch(BACKEND_ENDPOINT.toString());
+        return res.json();
+    }
+
     if (skill === READING ) {
 
         return (
-            <ReadingTest language={languageSelection} setSkill={setSkill} />
+            <ReadingTest handleMarkAnswers={handleMarkAnswers} language={languageSelection} setSkill={setSkill} />
         )
     }
 
     if (skill === LISTENING) {
-        return <ListeningTest language={languageSelection} setSkill={setSkill} />
+        return <ListeningTest handleMarkAnswers={handleMarkAnswers} generateText={generateText} language={languageSelection} setSkill={setSkill} />
     }
 
     if (skill === SPEAKING) {
@@ -136,7 +179,8 @@ function FormSelection({
 
 function ReadingTest({
     language,
-    setSkill
+    setSkill,
+    handleMarkAnswers
 }) {
     const [passage, setPassage] = useState(null)
     const [questions, setQuestions] = useState([]);
@@ -181,12 +225,7 @@ function ReadingTest({
 
     }, []);
 
-    const handleMarkAnswers = (e) => {
-        e.preventDefault();
-        const form = e.target;
-        const formData = new FormData(form);
-        const formJson = Object.fromEntries(formData.entries());
-    }
+
 
     return (
         <>
@@ -224,17 +263,35 @@ function ReadingTest({
 
 function ListeningTest({
     language,
-    setSkill
+    setSkill,
+    generateText,
+    handleMarkAnswers
 }) {
     const [questions, setQuestions] = useState([]);
-    const [soluions, setSolutions] = useState([]);
+    const [solutions, setSolutions] = useState(null);
     const [audioURL, setAudioURL] = useState("");
+    const [testId, setTestId] = useState(null);
     const audioRef = useRef(null);
 
 
     useEffect(() => {
         const getAudio = async () => {
-            const res = await fetch("http://127.0.0.1:8000/test");
+            const BACKEND_ENDPOINT = new URL("http://127.0.0.1:8000/transcription");
+
+            const text = await generateText({ language: language.value});
+            setQuestions(text['questions'])
+            setTestId(text.id)
+            const res = await fetch(BACKEND_ENDPOINT.toString(), {
+                headers: {
+                    "content-type": "application/json"
+                },
+                method: 'POST',
+                body: JSON.stringify({
+                    "language": language.value,
+                    "text": text.text
+                })
+            });
+
             const audioBlob = await res.blob();
             const audioURL = URL.createObjectURL(audioBlob)
 
@@ -250,6 +307,14 @@ function ListeningTest({
 
     }, [audioURL]);
 
+    async function handleFormSubmit(e) {
+        const s = await handleMarkAnswers(e, testId);
+        console.log(s);
+        setSolutions(s['answer'])
+    }
+
+
+
     return (
         <>
             <Header setSkill={setSkill} skill={LISTENING} />
@@ -262,22 +327,26 @@ function ListeningTest({
 
             </div>
 
-            <form className="listening-questions">
+            <form onSubmit={handleFormSubmit} className="listening-questions">
 
                 <Text bold>Based on the audio above, answer the following questions.</Text>
                 {
-                    questions.map(question => {
+                    questions.map((question, index) => {
                         return (
-                            <div key={question['number']} className="question">
-                                <Text >{question['number']}. {question['question']}</Text>
-                                <TextArea name={question['number']} fullWidth></TextArea>
+                            <div key={index + 1} className="question">
+                                <Text>{index + 1}. {question}</Text>
+                                <TextArea name={index} fullWidth></TextArea>
+                                {
+                                    solutions && <Text>{solutions[index]} </Text>
+
+                                }
                             </div>
                         )
                     })
                 }
                 <div className="questions__submit">
 
-                    <Button submit dynamicWidth >Mark Answer</Button>
+                    <Button submit dynamicWidth> Mark Answers </Button>
                 </div>
             </form>
         </>
