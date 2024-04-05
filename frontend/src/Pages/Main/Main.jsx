@@ -89,7 +89,7 @@ export default function Main() {
     if (skill === READING ) {
 
         return (
-            <ReadingTest handleMarkAnswers={handleMarkAnswers} language={languageSelection} setSkill={setSkill} />
+            <ReadingTest generateText={generateText} handleMarkAnswers={handleMarkAnswers} language={languageSelection} setSkill={setSkill} />
         )
     }
 
@@ -180,48 +180,22 @@ function FormSelection({
 function ReadingTest({
     language,
     setSkill,
-    handleMarkAnswers
+    handleMarkAnswers,
+    generateText
 }) {
     const [passage, setPassage] = useState(null)
     const [questions, setQuestions] = useState([]);
     const [soluions, setSolutions] = useState([]);
     useEffect(() => {
-        setPassage("Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, " +
-            "totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt " +
-            "explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur " +
-            "magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor " +
-            "sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam " +
-            "aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, " +
-            "nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse " +
-            "quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?")
+        (async function () {
 
-            let sampleQuestions = [
-                {
-                    number: 1,
-                    question: "What is a potato"
-                },
-                {
-                    number: 2,
-                    question: "What is a potato"
-                },
-                {
-                    number: 3,
-                    question: "What is a potato"
-                },
-                {
-                    number: 4,
-                    question: "What is a potato"
-                },
-                {
-                    number: 5,
-                    question: "What is a potato"
-                },
-                {
-                    number: 6,
-                    question: "What is a potato"
-                },
-            ]
-            setQuestions(sampleQuestions);
+            const text = await generateText({ language: language.value});
+            setPassage(text.text);
+            setQuestions(text.questions)
+        })();
+
+
+
 
     }, []);
 
@@ -240,11 +214,11 @@ function ReadingTest({
                 <form className="passage__questions" onSubmit={handleMarkAnswers}>
                     <Text bold>Based on the passage above, answer the following questions.</Text>
                     {
-                        questions.map(question => {
+                        questions.map((question, index) => {
                             return (
-                                <div key={question['number']} className="question">
-                                    <Text >{question['number']}. {question['question']}</Text>
-                                    <TextArea name={question['number']} fullWidth></TextArea>
+                                <div key={index} className="question">
+                                    <Text> {index + 1}. {question}</Text>
+                                    <TextArea name={index} fullWidth></TextArea>
                                 </div>
                             )
                         })
