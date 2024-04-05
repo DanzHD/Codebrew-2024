@@ -4,7 +4,7 @@ import useThemeContext from "../../Context/ThemeContext/useThemeContext.jsx";
 import "./main.scss"
 import Select from "react-select";
 import Button from "../../Components/Button/Button.jsx";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {CHINESE, ENGLISH, FRENCH, JAPANESE, LISTENING, READING, SPEAKING} from "../../Util/Constants.jsx";
 import "./_header.scss"
 import "./_reading.scss"
@@ -226,49 +226,37 @@ function ListeningTest({
     language,
     setSkill
 }) {
-    const [audioPlaying, setAudioPlaying] = useState(false);
     const [questions, setQuestions] = useState([]);
     const [soluions, setSolutions] = useState([]);
+    const [audioURL, setAudioURL] = useState("");
+    const audioRef = useRef(null);
+
+
     useEffect(() => {
+        const getAudio = async () => {
+            const res = await fetch("http://127.0.0.1:8000/test");
+            const audioBlob = await res.blob();
+            const audioURL = URL.createObjectURL(audioBlob)
 
+            setAudioURL(audioURL)
 
-        let sampleQuestions = [
-            {
-                number: 1,
-                question: "What is a potato"
-            },
-            {
-                number: 2,
-                question: "What is a potato"
-            },
-            {
-                number: 3,
-                question: "What is a potato"
-            },
-            {
-                number: 4,
-                question: "What is a potato"
-            },
-            {
-                number: 5,
-                question: "What is a potato"
-            },
-            {
-                number: 6,
-                question: "What is a potato"
-            },
-        ]
-        setQuestions(sampleQuestions);
+        }
+        getAudio();
 
     }, []);
+
+    useEffect(() => {
+        audioRef.current.src = audioURL;
+
+    }, [audioURL]);
 
     return (
         <>
             <Header setSkill={setSkill} skill={LISTENING} />
 
             <div className="play-audio">
-                <audio controls>
-                    <source src="horse.mp3" type="audio/mpeg"/>
+                <audio ref={audioRef}  controls>
+                    <source type="audio/mpeg"/>
                     Your browser does not support the audio element.
                 </audio>
 
