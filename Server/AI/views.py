@@ -6,7 +6,7 @@ from rest_framework.parsers import JSONParser
 import os
 
 
-# from .api import 
+from .api import reply
 
 # Create your views here.
 # GEMINI_API_KEY = os.environ.get()
@@ -26,17 +26,10 @@ def my_view(request):
 
     return HttpResponse(f"Name: {name}, Age: {age}")
 
+
 @api_view(['POST'])
-def get_text(request):
-    # Parse the JSON request
-    data = JSONParser().parse(request)
+def get_data(request):
 
-    # Retrieve the user's input from the data. 
-    # Replace 'user_input' with the actual key name in the JSON request
-    user_input = data.get('user_input', '')
+    response = reply(request.data['language'])
 
-    # Append "!" to the end of the user's input
-    modified_input = user_input + "!"
-
-    # Return the modified string in a JSON response
-    return JsonResponse({"modified_input": modified_input})
+    return Response(response)
