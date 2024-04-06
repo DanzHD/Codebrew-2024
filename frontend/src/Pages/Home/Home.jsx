@@ -14,8 +14,8 @@ export default function Home() {
             <div className="theme-icon">
                 {
                     theme === THEMES.light ?
-                        <div onClick={handleToggleTheme} className="material-symbols-outlined theme">dark_mode</div> :
-                        <div onClick={handleToggleTheme} style={{color: "white"}} className="material-symbols-outlined theme">light_mode</div>
+                        <Button onClick={handleToggleTheme} className="material-symbols-outlined theme">Dark Mode</Button> :
+                        <Button onClick={handleToggleTheme} style={{color: "white"}} className="material-symbols-outlined theme">Light Mode</Button>
 
                 }
             </div>
