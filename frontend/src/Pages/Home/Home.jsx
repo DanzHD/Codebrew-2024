@@ -22,15 +22,13 @@ export default function Home() {
             <div className="home">
                 <div className="home__intro">
                     <div className="home__intro__logo">
-                        <Text heading centered>Placeholder</Text>
+                        <Text large heading centered bold>Lerna</Text>
                     </div>
                     <div className="home__intro__description">
 
-                        <Text>
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                            labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                            nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit
-
+                        <Text italicize>
+                            An AI powered language learning app to accelerate your listening and reading skills through
+                            practical application
                         </Text>
                     </div>
                     <div className="home__intro__button">

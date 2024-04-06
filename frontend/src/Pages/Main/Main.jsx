@@ -19,6 +19,7 @@ import "./_header.scss"
 import "./_reading.scss"
 import "./_listening.scss"
 import TextArea from "../../Components/TextArea/TextArea.jsx";
+import Loading from "../Loading/Loading.jsx";
 
 const languageOptions = [
     { value: ENGLISH, label: ENGLISH},
@@ -28,8 +29,7 @@ const languageOptions = [
 ]
 const skills = [
     { value: READING, label: READING},
-    { value: LISTENING, label: LISTENING},
-    { value: SPEAKING, label: SPEAKING}
+    { value: LISTENING, label: LISTENING}
 ]
 export default function Main() {
     const {theme, handleToggleTheme} = useThemeContext();
@@ -85,6 +85,8 @@ export default function Main() {
         const res = await fetch(BACKEND_ENDPOINT.toString());
         return res.json();
     }
+
+
 
     if (skill === READING ) {
 
@@ -185,19 +187,38 @@ function ReadingTest({
 }) {
     const [passage, setPassage] = useState(null)
     const [questions, setQuestions] = useState([]);
-    const [soluions, setSolutions] = useState([]);
+    const [solutions, setSolutions] = useState([]);
+    const [testId, setTestId] = useState(null);
+    const [loading, setLoading] = useState(false);
+
     useEffect(() => {
         (async function () {
-
-            const text = await generateText({ language: language.value});
-            setPassage(text.text);
-            setQuestions(text.questions)
+            try {
+                setLoading(true)
+                const text = await generateText({ language: language.value});
+                setPassage(text.text);
+                setQuestions(text.questions)
+                setTestId(text.id)
+            } catch (err) {
+                console.error(err)
+            } finally {
+                setLoading(false)
+            }
         })();
 
 
 
 
     }, []);
+
+    async function handleFormSubmit(e) {
+        const s = await handleMarkAnswers(e, testId);
+        setSolutions(s['answer'])
+    }
+
+    if (loading) {
+        return <Loading description="Loading..." />
+    }
 
 
 
@@ -211,7 +232,7 @@ function ReadingTest({
                     <Text>{passage} </Text>
                 </div>
 
-                <form className="passage__questions" onSubmit={handleMarkAnswers}>
+                <form className="passage__questions" onSubmit={handleFormSubmit}>
                     <Text bold>Based on the passage above, answer the following questions.</Text>
                     {
                         questions.map((question, index) => {
@@ -219,6 +240,7 @@ function ReadingTest({
                                 <div key={index} className="question">
                                     <Text> {index + 1}. {question}</Text>
                                     <TextArea name={index} fullWidth></TextArea>
+                                    <Text color="red">{solutions[index]}</Text>
                                 </div>
                             )
                         })
@@ -245,31 +267,39 @@ function ListeningTest({
     const [solutions, setSolutions] = useState(null);
     const [audioURL, setAudioURL] = useState("");
     const [testId, setTestId] = useState(null);
+    const [loading, setLoading] = useState(false);
     const audioRef = useRef(null);
 
 
     useEffect(() => {
         const getAudio = async () => {
-            const BACKEND_ENDPOINT = new URL("http://127.0.0.1:8000/transcription");
+            try {
+                setLoading(true)
+                const BACKEND_ENDPOINT = new URL("http://127.0.0.1:8000/transcription");
 
-            const text = await generateText({ language: language.value});
-            setQuestions(text['questions'])
-            setTestId(text.id)
-            const res = await fetch(BACKEND_ENDPOINT.toString(), {
-                headers: {
-                    "content-type": "application/json"
-                },
-                method: 'POST',
-                body: JSON.stringify({
-                    "language": language.value,
-                    "text": text.text
-                })
-            });
+                const text = await generateText({ language: language.value});
+                setQuestions(text['questions'])
+                setTestId(text.id)
+                const res = await fetch(BACKEND_ENDPOINT.toString(), {
+                    headers: {
+                        "content-type": "application/json"
+                    },
+                    method: 'POST',
+                    body: JSON.stringify({
+                        "language": language.value,
+                        "text": text.text
+                    })
+                });
 
-            const audioBlob = await res.blob();
-            const audioURL = URL.createObjectURL(audioBlob)
+                const audioBlob = await res.blob();
+                const audioURL = URL.createObjectURL(audioBlob)
 
-            setAudioURL(audioURL)
+                setAudioURL(audioURL)
+            } catch (err) {
+                console.error(err)
+            } finally {
+                setLoading(false)
+            }
 
         }
         getAudio();
@@ -281,12 +311,26 @@ function ListeningTest({
 
     }, [audioURL]);
 
+
+
     async function handleFormSubmit(e) {
-        const s = await handleMarkAnswers(e, testId);
-        console.log(s);
-        setSolutions(s['answer'])
+        try {
+
+            setLoading(true)
+            const s = await handleMarkAnswers(e, testId);
+            console.log(s);
+            setSolutions(s['answer']);
+        }catch (err) {
+            console.error(err)
+        } finally {
+
+            setLoading(false);
+        }
     }
 
+    if (loading) {
+        return <Loading description="loading..." />
+    }
 
 
     return (
@@ -346,7 +390,7 @@ function Header({
 }) {
     return (
         <div className="header">
-            <Text>LogoPlaceHolder</Text>
+            <Text>Lerna</Text>
             <Text heading bold>{skill}</Text>
             <Button onClick={() => setSkill(null)}>Back</Button>
         </div>

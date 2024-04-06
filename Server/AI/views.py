@@ -75,9 +75,9 @@ def generate_text(request):
     chatId = str(uuid.uuid4())
     tests[chatId] = chat
     prompt = f"""Generate a text in {language} about a random topic. 
-        It should be less than 300 words. Create 5 questions based on the text.
-        return response in JSON format. 1 key for question, 1 key for text. 
-        Do not put backticks or the word JSON
+        It should be less than 150 words. Create 5 questions based on the text.
+        return response in JSON format. Use the key 'questions' and 'text'
+        Do not put backticks or the word JSON. 
         """
 
     response = chat.send_message(prompt)
