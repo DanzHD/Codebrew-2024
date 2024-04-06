@@ -1,4 +1,4 @@
-# {
+# {APP NAME}
 {app name} is a powerful app that provides language learners practical lessons. With questions and markings powered by AI, the shortest path for the language master is guaranteed.
 
 {insert images/videos of app}
