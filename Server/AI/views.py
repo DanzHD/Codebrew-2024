@@ -59,7 +59,7 @@ def mark_solutions(request):
 
     chatId = request.data['id']
     chat = tests[chatId]
-    prompt += "Are they correct? return your answer in an array json format with the key 'answer'. There should be no backticks"
+    prompt += '''Are they correct? return your answer in an array json format in the form {"answers": []}. There should be no backticks or the word json'''
     response = chat.send_message(prompt)
     print(response.text)
     jsonObject = json.loads(response.text)
@@ -74,11 +74,11 @@ def generate_text(request):
     chat = model.start_chat(history=[])
     chatId = str(uuid.uuid4())
     tests[chatId] = chat
-    prompt = f"""Generate a text in {language} about a random topic. 
+    prompt = f'''Generate a text in {language} about a random topic. 
         It should be less than 150 words. Create 5 questions based on the text.
-        return response in JSON format. Use the key 'questions' and 'text'
+        return response in JSON format in the form {{"text": ..., "questions": [...,...,]}}
         Do not put backticks or the word JSON. 
-        """
+        '''
 
     response = chat.send_message(prompt)
     print(response.text)

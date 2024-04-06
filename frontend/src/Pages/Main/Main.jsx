@@ -20,6 +20,7 @@ import "./_reading.scss"
 import "./_listening.scss"
 import TextArea from "../../Components/TextArea/TextArea.jsx";
 import Loading from "../Loading/Loading.jsx";
+import {MoonLoader} from "react-spinners";
 
 const languageOptions = [
     { value: ENGLISH, label: ENGLISH},
@@ -212,8 +213,15 @@ function ReadingTest({
     }, []);
 
     async function handleFormSubmit(e) {
-        const s = await handleMarkAnswers(e, testId);
-        setSolutions(s['answer'])
+        try {
+            setLoading(true)
+            const s = await handleMarkAnswers(e, testId);
+            setSolutions(s['answers'])
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false)
+        }
     }
 
     if (loading) {
@@ -268,7 +276,6 @@ function ListeningTest({
     const [audioURL, setAudioURL] = useState("");
     const [testId, setTestId] = useState(null);
     const [loading, setLoading] = useState(false);
-    const audioRef = useRef(null);
 
 
     useEffect(() => {
@@ -306,10 +313,7 @@ function ListeningTest({
 
     }, []);
 
-    useEffect(() => {
-        audioRef.current.src = audioURL;
 
-    }, [audioURL]);
 
 
 
@@ -318,8 +322,7 @@ function ListeningTest({
 
             setLoading(true)
             const s = await handleMarkAnswers(e, testId);
-            console.log(s);
-            setSolutions(s['answer']);
+            setSolutions(s['answers']);
         }catch (err) {
             console.error(err)
         } finally {
@@ -329,8 +332,10 @@ function ListeningTest({
     }
 
     if (loading) {
-        return <Loading description="loading..." />
+        return <Loading description="Loading" />
     }
+
+
 
 
     return (
@@ -338,7 +343,7 @@ function ListeningTest({
             <Header setSkill={setSkill} skill={LISTENING} />
 
             <div className="play-audio">
-                <audio ref={audioRef}  controls>
+                <audio src={audioURL}  controls>
                     <source type="audio/mpeg"/>
                     Your browser does not support the audio element.
                 </audio>
@@ -355,7 +360,7 @@ function ListeningTest({
                                 <Text>{index + 1}. {question}</Text>
                                 <TextArea name={index} fullWidth></TextArea>
                                 {
-                                    solutions && <Text>{solutions[index]} </Text>
+                                    solutions && <Text color="red">{solutions[index]} </Text>
 
                                 }
                             </div>
@@ -364,7 +369,10 @@ function ListeningTest({
                 }
                 <div className="questions__submit">
 
-                    <Button submit dynamicWidth> Mark Answers </Button>
+                    <Button submit dynamicWidth disabled={loading}>
+                        <div>Mark Answers</div>
+
+                    </Button>
                 </div>
             </form>
         </>
@@ -390,7 +398,7 @@ function Header({
 }) {
     return (
         <div className="header">
-            <Text>Lerna</Text>
+            <Text bold large>Lerna</Text>
             <Text heading bold>{skill}</Text>
             <Button onClick={() => setSkill(null)}>Back</Button>
         </div>
